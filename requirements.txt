@@ -1,0 +1,12 @@
+langchain
+numpy
+pandas
+python-dotenv
+langchain-community
+langchain-core
+langchain-groq
+sentence-transformers
+Flask
+langsmith>=0.1.77
+Pypdf
+faiss-cpu

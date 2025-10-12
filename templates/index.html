@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>PDF RAG — Flask + FAISS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .card { border: 1px solid #dadada; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    h1 { margin: 0 0 8px; font-size: 1.6rem; display:flex; align-items:center; gap:10px; }
+    .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; background:#eee; font-size: 0.8rem; }
+    .muted { color:#666; font-size: 0.95rem; }
+    input[type="text"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; }
+    button { padding: 10px 16px; border-radius: 8px; border: 0; background: #111; color: #fff; margin-top: 8px; cursor: pointer; }
+    button:hover { background: #333; }
+    details { margin-top: 6px; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+    ul { padding-left: 18px; }
+    li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📄 PDF RAG — Flask + FAISS <span class="pill">{{ model_name }}</span></h1>
+    <p class="muted">Ask questions grounded in your indexed PDFs.</p>
+
+    <div class="card">
+      <form method="POST">
+        <label for="question"><strong>Ask something:</strong></label><br />
+        <input type="text" id="question" name="question" value="{{ question or '' }}" placeholder="e.g., What is scaled dot-product attention?" />
+        <button type="submit">Ask</button>
+      </form>
+    </div>
+
+    {% if answer %}
+      <div class="card">
+        <h2>Answer</h2>
+        <p>{{ answer }}</p>
+      </div>
+
+      <div class="card">
+        <h3>Sources</h3>
+        <ul>
+          {% for s in sources %}
+            <li>
+              <strong>{{ s.label }}</strong> — page <em>{{ s.page }}</em> — <span class="muted">{{ s.source }}</span>
+              <details><summary>Show preview</summary><pre>{{ s.preview }}</pre></details>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if chat_history and chat_history|length > 0 %}
+      <div class="card">
+        <h3>Chat History</h3>
+        <ul>
+          {% for role, text in chat_history %}
+            <li><strong>{{ role }}:</strong> {{ text }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
