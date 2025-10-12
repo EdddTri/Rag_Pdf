@@ -1,10 +1,3 @@
-# Rag_Pdf
-
-Of course. Here is a complete `README.md` file for your project, written in proper Markdown syntax. You can copy and paste this directly into a new file named `README.md` in your project's root directory.
-
------
-
-````markdown
 # RAG Chatbot with Groq, LangChain & FAISS
 
 This project is a web-based chatbot that uses Retrieval-Augmented Generation (RAG) to answer questions about specific PDF documents. It's built with Python, Flask, LangChain, and powered by the lightning-fast Groq LPU™ Inference Engine for real-time responses.
