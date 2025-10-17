@@ -91,7 +91,7 @@ retrieve = RunnableLambda(lambda x: x["question"]) | retriever
 prep_inputs = RunnableParallel(
     context=retrieve,
     question=RunnableLambda(lambda x: x["question"]),
-    chat_history=RunnableLambda(lambda x: x.get("chat_history", [])),  # 👈 pass it through
+    chat_history=RunnableLambda(lambda x: x.get("chat_history", [])),  
 )
 
 # 3) Final RAG pipeline
@@ -176,5 +176,6 @@ def favicon():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=True)
+
 
 
