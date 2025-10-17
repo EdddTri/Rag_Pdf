@@ -1,4 +1,4 @@
-# app.py
+
 import os
 from pathlib import Path
 from flask import Flask, request, session, jsonify, render_template
@@ -18,15 +18,12 @@ from langchain_core.prompts import (
     HumanMessagePromptTemplate,
 )
 from langchain.chains.combine_documents import create_stuff_documents_chain
-# (we won't use create_retrieval_chain since your LC version lacks input_key)
-
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
-# -------------------------
 # Env & Config
-# -------------------------
+
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY:
@@ -40,9 +37,9 @@ TOP_K = 4
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
-# -------------------------
+
 # Vector store + embeddings
-# -------------------------
+
 if not Path(INDEX_DIR).exists():
     raise RuntimeError(f"FAISS index not found at {INDEX_DIR}. Run build_index.py first.")
 
@@ -62,14 +59,14 @@ retriever = vectordb.as_retriever(
     search_kwargs={"k": TOP_K}
 ).with_config({"run_name": "FAISSRetriever"})
 
-# -------------------------
+
 # LLM
-# -------------------------
+
 llm = ChatGroq(api_key=GROQ_API_KEY, model_name=LLM_MODEL, temperature=0.2)
 
-# -------------------------
-# Prompt & doc-stuff chain (template style)
-# -------------------------
+
+# Prompt & doc-stuff chain 
+
 messages = [
     SystemMessagePromptTemplate.from_template(
         "You are a precise, citation-friendly assistant.\n"
@@ -84,14 +81,14 @@ messages = [
 prompt = ChatPromptTemplate.from_messages(messages)
 doc_chain = create_stuff_documents_chain(llm, prompt).with_config({"run_name": "StuffDocsChain"})
 
-# -------------------------
-# Manual retrieval wiring (so retriever gets a STRING, not a dict)
-# -------------------------
+
+# Manual retrieval wiring
+
 
 # 1) Extract question string and run retrieval
 retrieve = RunnableLambda(lambda x: x["question"]) | retriever
 
-# 2) Prepare inputs for the doc-stuff chain, INCLUDING chat_history
+# 2) inputs for the doc-stuff chain, INCLUDING chat_history
 prep_inputs = RunnableParallel(
     context=retrieve,
     question=RunnableLambda(lambda x: x["question"]),
@@ -104,9 +101,7 @@ rag_chain = RunnableParallel(
     context=RunnableLambda(lambda x: x["question"]) | retriever  # List[Document]
 ).with_config({"run_name": "RAGPipeline"})
 
-# -------------------------
 # History
-# -------------------------
 _history_store: dict[str, ChatMessageHistory] = {}
 
 def get_session_id() -> str:
@@ -136,9 +131,9 @@ def run_config() -> RunnableConfig:
         metadata={"k": TOP_K, "model": LLM_MODEL, "embed_model": EMBED_MODEL},
     )
 
-# -------------------------
+
 # Routes
-# -------------------------
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     answer = None
@@ -182,3 +177,4 @@ def favicon():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=True)
+
